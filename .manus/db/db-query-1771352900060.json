@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET role = 'admin' WHERE email = 'vamsi.bhogi@platestory.in';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute UPDATE users SET role = 'admin' WHERE email = 'vamsi.bhogi@platestory.in';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1569
+}

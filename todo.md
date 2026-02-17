@@ -71,3 +71,13 @@
 ## Iteration 2 - User Feedback
 - [x] Add @platestory.in email domain restriction for access
 - [x] Make the design more colorful and vibrant (gradients, richer colors, visual depth)
+
+## Iteration 3 - User Feedback
+- [x] Promote vamsi.bhogi@platestory.in to admin role
+- [x] Guide user to remove "Made with Manus" badge via Settings > General
+
+## Iteration 4 - Bug Fix
+- [x] Fix: Courses created in admin not visible in Course Catalog (was not a bug — courses need to be published first)
+
+## Iteration 5 - Bug Fix
+- [x] Fix: Video not playing in lesson player (filename with # and spaces broke S3 URL)

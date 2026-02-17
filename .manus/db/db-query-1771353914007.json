@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, courseId, title, type, videoUrl, videoKey, videoDurationSec FROM lessons LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, courseId, title, type, videoUrl, videoKey, videoDurationSec FROM lessons LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "courseId": "1",
+      "title": "basic test",
+      "type": "video",
+      "videoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/8dw7CX444V4xOFE2g__f_-",
+      "videoKey": "videos/8dw7CX444V4xOFE2g__f_-#1 Custom Cakes.mp4",
+      "videoDurationSec": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourseId\ttitle\ttype\tvideoUrl\tvideoKey\tvideoDurationSec\n1\t1\tbasic test\tvideo\thttps://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/8dw7CX444V4xOFE2g__f_-\tvideos/8dw7CX444V4xOFE2g__f_-#1 Custom Cakes.mp4\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1520
+}

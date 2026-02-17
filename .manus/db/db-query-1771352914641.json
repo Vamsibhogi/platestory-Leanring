@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, name, email, role, openId FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, name, email, role, openId FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "vamsi bhogi",
+      "email": "vamsi.bhogi@gmail.com",
+      "role": "admin",
+      "openId": "TNoGuN6rL95BmgU7WmqDNF"
+    },
+    {
+      "id": "176",
+      "name": "vamsi.bhogi",
+      "email": "vamsi.bhogi@platestory.in",
+      "role": "admin",
+      "openId": "beXe994RmWDNWYpD8wTpzG"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\topenId\n1\tvamsi bhogi\tvamsi.bhogi@gmail.com\tadmin\tTNoGuN6rL95BmgU7WmqDNF\n176\tvamsi.bhogi\tvamsi.bhogi@platestory.in\tadmin\tbeXe994RmWDNWYpD8wTpzG\n",
+  "stderr": "",
+  "execution_time_ms": 1517
+}

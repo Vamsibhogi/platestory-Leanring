@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, title, description, mode, difficulty, published, createdById FROM courses;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, title, description, mode, difficulty, published, createdById FROM courses;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'published' in 'field list'"
+  ]
+}

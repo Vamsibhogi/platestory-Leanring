@@ -1,0 +1,26 @@
+{
+  "query": "SELECT * FROM courses;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT * FROM courses;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "Sales ",
+      "description": "",
+      "thumbnailUrl": "NULL",
+      "category": "",
+      "difficulty": "beginner",
+      "mode": "standard",
+      "estimatedMinutes": "0",
+      "pointsReward": "10",
+      "isPublished": "0",
+      "isMandatory": "0",
+      "createdBy": "176",
+      "createdAt": "2026-02-17 18:34:17",
+      "updatedAt": "2026-02-17 18:34:17"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tdescription\tthumbnailUrl\tcategory\tdifficulty\tmode\testimatedMinutes\tpointsReward\tisPublished\tisMandatory\tcreatedBy\tcreatedAt\tupdatedAt\n1\tSales \t\tNULL\t\tbeginner\tstandard\t0\t10\t0\t0\t176\t2026-02-17 18:34:17\t2026-02-17 18:34:17\n",
+  "stderr": "",
+  "execution_time_ms": 1496
+}

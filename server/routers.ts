@@ -514,7 +514,9 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const buffer = Buffer.from(input.base64Data, "base64");
-        const fileKey = `videos/${nanoid()}-${input.fileName}`;
+        // Sanitize filename: remove special chars (#, spaces, etc.) that break URLs
+        const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const fileKey = `videos/${nanoid()}-${safeName}`;
         const { url } = await storagePut(fileKey, buffer, input.contentType);
         return { url, fileKey };
       }),
@@ -526,7 +528,8 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         const buffer = Buffer.from(input.base64Data, "base64");
-        const fileKey = `thumbnails/${nanoid()}-${input.fileName}`;
+        const safeName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const fileKey = `thumbnails/${nanoid()}-${safeName}`;
         const { url } = await storagePut(fileKey, buffer, input.contentType);
         return { url, fileKey };
       }),

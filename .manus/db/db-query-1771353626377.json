@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, title, isPublished, mode, difficulty, createdBy FROM courses;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, title, isPublished, mode, difficulty, createdBy FROM courses;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "Sales ",
+      "isPublished": "0",
+      "mode": "standard",
+      "difficulty": "beginner",
+      "createdBy": "176"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tisPublished\tmode\tdifficulty\tcreatedBy\n1\tSales \t0\tstandard\tbeginner\t176\n",
+  "stderr": "",
+  "execution_time_ms": 1537
+}

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, title, COALESCE(videoUrl, 'NULL') as videoUrl, COALESCE(videoKey, 'NULL') as videoKey FROM lessons;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, title, COALESCE(videoUrl, 'NULL') as videoUrl, COALESCE(videoKey, 'NULL') as videoKey FROM lessons;",
+  "rows": [
+    {
+      "id": "1",
+      "title": "basic test",
+      "videoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/8dw7CX444V4xOFE2g__f_-",
+      "videoKey": "videos/8dw7CX444V4xOFE2g__f_-#1 Custom Cakes.mp4"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tvideoUrl\tvideoKey\n1\tbasic test\thttps://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/8dw7CX444V4xOFE2g__f_-\tvideos/8dw7CX444V4xOFE2g__f_-#1 Custom Cakes.mp4\n",
+  "stderr": "",
+  "execution_time_ms": 1554
+}
