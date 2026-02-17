@@ -103,13 +103,17 @@ export default function CourseCatalog() {
               const ModeIcon = modeIcons[course.mode] || BookOpen;
               return (
                 <Link key={course.id} href={`/courses/${course.id}`}>
-                  <Card className="border-border/50 hover:shadow-lg transition-all duration-300 cursor-pointer group h-full">
+                  <Card className="border-border/50 card-hover cursor-pointer group h-full">
                     {/* Thumbnail */}
-                    <div className="h-40 bg-gradient-to-br from-primary/10 to-accent/10 rounded-t-xl flex items-center justify-center relative overflow-hidden">
+                    <div className={`h-40 rounded-t-xl flex items-center justify-center relative overflow-hidden ${!course.thumbnailUrl ? (
+                      course.mode === 'micro' ? 'bg-gradient-to-br from-amber-400 to-orange-500' :
+                      course.mode === 'deep' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' :
+                      'bg-gradient-to-br from-primary to-primary/70'
+                    ) : ''}`}>
                       {course.thumbnailUrl ? (
                         <img src={course.thumbnailUrl} alt={course.title} className="w-full h-full object-cover" />
                       ) : (
-                        <ModeIcon className="h-12 w-12 text-primary/30 group-hover:scale-110 transition-transform" />
+                        <ModeIcon className="h-12 w-12 text-white/40 group-hover:scale-110 transition-transform" />
                       )}
                       {course.isMandatory && (
                         <Badge className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px]">

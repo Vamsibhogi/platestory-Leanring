@@ -88,13 +88,13 @@ export default function QuizPage() {
       <AppLayout>
         <div className="container py-12">
           <div className="max-w-lg mx-auto text-center">
-            <div className={`h-20 w-20 rounded-full mx-auto mb-6 flex items-center justify-center ${
-              result.passed ? "bg-emerald-100" : "bg-red-100"
+            <div className={`h-20 w-20 rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg ${
+              result.passed ? "bg-gradient-to-br from-emerald-400 to-teal-500" : "bg-gradient-to-br from-red-400 to-rose-500"
             }`}>
               {result.passed ? (
-                <Trophy className="h-10 w-10 text-emerald-600" />
+                <Trophy className="h-10 w-10 text-white" />
               ) : (
-                <XCircle className="h-10 w-10 text-red-600" />
+                <XCircle className="h-10 w-10 text-white" />
               )}
             </div>
             <h1 className="text-2xl font-serif font-semibold mb-2">
@@ -169,7 +169,12 @@ export default function QuizPage() {
           {currentQuestion && (
             <Card className="border-border/50 mb-6">
               <CardContent className="p-6">
-                <Badge variant="outline" className="mb-3 capitalize">
+                <Badge variant="outline" className={`mb-3 capitalize ${
+                  currentQuestion.type === 'multiple_choice' ? 'border-blue-300 text-blue-700 bg-blue-50' :
+                  currentQuestion.type === 'drag_order' ? 'border-violet-300 text-violet-700 bg-violet-50' :
+                  currentQuestion.type === 'visual' ? 'border-amber-300 text-amber-700 bg-amber-50' :
+                  'border-emerald-300 text-emerald-700 bg-emerald-50'
+                }`}>
                   {currentQuestion.type.replace("_", " ")}
                 </Badge>
                 <h2 className="text-lg font-medium mb-6">{currentQuestion.question}</h2>

@@ -83,8 +83,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
-              <GraduationCap className="h-7 w-7 text-primary" />
-              <span className="font-serif font-semibold text-lg tracking-tight hidden sm:inline">Platestory</span>
+              <div className="h-8 w-8 rounded-lg gradient-bg flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-serif font-semibold text-lg tracking-tight hidden sm:inline gradient-text">Platestory</span>
             </Link>
 
             {/* Desktop Nav */}

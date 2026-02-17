@@ -14,60 +14,52 @@ export default function AdminDashboard() {
         <p className="text-muted-foreground text-sm">Overview of your learning platform</p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Vibrant Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card className="border-border/50">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                <Users className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.data?.totalUsers ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Total Users</p>
-              </div>
+        <div className="stat-card" style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)" }}>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <Users className="h-5 w-5 text-white" />
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <BookOpen className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.data?.totalCourses ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Courses</p>
-              </div>
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.totalUsers ?? 0}</p>
+              <p className="text-xs text-white/70">Total Users</p>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-                <TrendingUp className="h-5 w-5 text-amber-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.data?.totalEnrollments ?? 0}</p>
-                <p className="text-xs text-muted-foreground">Enrollments</p>
-              </div>
+          </div>
+        </div>
+        <div className="stat-card gradient-bg">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <BookOpen className="h-5 w-5 text-white" />
             </div>
-          </CardContent>
-        </Card>
-        <Card className="border-border/50">
-          <CardContent className="pt-5 pb-4 px-5">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{stats.data?.completionRate ?? 0}%</p>
-                <p className="text-xs text-muted-foreground">Completion Rate</p>
-              </div>
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.totalCourses ?? 0}</p>
+              <p className="text-xs text-white/70">Courses</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <div className="stat-card gradient-bg-warm">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <TrendingUp className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.totalEnrollments ?? 0}</p>
+              <p className="text-xs text-white/70">Enrollments</p>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card gradient-bg-success">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{stats.data?.completionRate ?? 0}%</p>
+              <p className="text-xs text-white/70">Completion Rate</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Recent Activity */}
@@ -82,7 +74,7 @@ export default function AdminDashboard() {
             <div className="space-y-3">
               {activity.data?.slice(0, 15).map((item) => (
                 <div key={item.id} className="flex items-center gap-3 py-2 border-b last:border-b-0">
-                  <div className={`h-2 w-2 rounded-full shrink-0 ${
+                  <div className={`h-2.5 w-2.5 rounded-full shrink-0 ${
                     item.action.includes("completed") ? "bg-emerald-500" :
                     item.action.includes("enrolled") ? "bg-blue-500" :
                     item.action.includes("quiz") ? "bg-amber-500" : "bg-muted-foreground"

@@ -44,7 +44,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-6 p-8 max-w-md">
-          <GraduationCap className="h-12 w-12 text-primary" />
+          <div className="h-16 w-16 rounded-2xl gradient-bg flex items-center justify-center">
+            <GraduationCap className="h-8 w-8 text-white" />
+          </div>
           <h1 className="text-xl font-semibold">Admin Access Required</h1>
           <p className="text-sm text-muted-foreground text-center">
             You need admin privileges to access this area.
@@ -66,14 +68,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-64 border-r bg-card/50 flex flex-col shrink-0 sticky top-0 h-screen">
-        <div className="p-4 border-b">
+      {/* Dark Sidebar */}
+      <aside className="w-64 bg-sidebar text-sidebar-foreground flex flex-col shrink-0 sticky top-0 h-screen">
+        <div className="p-4 border-b border-sidebar-border">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <GraduationCap className="h-6 w-6 text-primary" />
+            <div className="h-8 w-8 rounded-lg bg-sidebar-primary/20 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-sidebar-primary" />
+            </div>
             <div>
-              <span className="font-serif font-semibold text-sm">Platestory</span>
-              <span className="text-xs text-muted-foreground block">Admin Panel</span>
+              <span className="font-serif font-semibold text-sm text-sidebar-foreground">Platestory</span>
+              <span className="text-xs text-sidebar-foreground/60 block">Admin Panel</span>
             </div>
           </Link>
         </div>
@@ -86,8 +90,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <button
                   className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-primary/10 text-primary shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                      ? "bg-sidebar-primary/20 text-sidebar-primary shadow-sm"
+                      : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent"
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
@@ -98,24 +102,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="p-3 border-t">
+        <div className="p-3 border-t border-sidebar-border">
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
+            <button className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors">
               <ChevronLeft className="h-4 w-4" />
               Back to LMS
             </button>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 w-full px-3 py-2 mt-1 rounded-lg hover:bg-accent transition-colors">
-                <Avatar className="h-7 w-7 border">
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary">
+              <button className="flex items-center gap-3 w-full px-3 py-2 mt-1 rounded-lg hover:bg-sidebar-accent transition-colors">
+                <Avatar className="h-7 w-7 border border-sidebar-border">
+                  <AvatarFallback className="text-xs bg-sidebar-primary/20 text-sidebar-primary">
                     {user.name?.charAt(0).toUpperCase() ?? "A"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="text-left min-w-0">
-                  <p className="text-sm font-medium truncate">{user.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                  <p className="text-sm font-medium truncate text-sidebar-foreground">{user.name}</p>
+                  <p className="text-xs text-sidebar-foreground/50 truncate">{user.email}</p>
                 </div>
               </button>
             </DropdownMenuTrigger>

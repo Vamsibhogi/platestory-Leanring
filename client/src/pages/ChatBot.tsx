@@ -41,8 +41,8 @@ export default function ChatBot() {
         <div className="max-w-3xl mx-auto">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Bot className="h-5 w-5 text-primary" />
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-md">
+                <Bot className="h-5 w-5 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-serif font-semibold">PlateBot</h1>
@@ -71,7 +71,7 @@ export default function ChatBot() {
                           onClick={() => {
                             setMessage(suggestion);
                           }}
-                          className="px-3 py-1.5 rounded-full border text-xs hover:bg-accent transition-colors"
+                          className="px-3 py-1.5 rounded-full border border-primary/20 text-xs hover:bg-primary/5 hover:border-primary/40 transition-colors text-primary"
                         >
                           {suggestion}
                         </button>

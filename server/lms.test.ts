@@ -331,6 +331,19 @@ describe("badge procedures", () => {
   });
 });
 
+describe("email domain restriction", () => {
+  it("ALLOWED_EMAIL_DOMAIN is set to platestory.in", async () => {
+    const { ALLOWED_EMAIL_DOMAIN } = await import("../shared/const");
+    expect(ALLOWED_EMAIL_DOMAIN).toBe("platestory.in");
+  });
+
+  it("DOMAIN_RESTRICTED_ERR_MSG is defined", async () => {
+    const { DOMAIN_RESTRICTED_ERR_MSG } = await import("../shared/const");
+    expect(DOMAIN_RESTRICTED_ERR_MSG).toBeDefined();
+    expect(DOMAIN_RESTRICTED_ERR_MSG.length).toBeGreaterThan(0);
+  });
+});
+
 describe("input validation", () => {
   it("rejects empty course title", async () => {
     const ctx = createAdminContext();

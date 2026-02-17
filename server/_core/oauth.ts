@@ -1,4 +1,4 @@
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS, ALLOWED_EMAIL_DOMAIN, DOMAIN_RESTRICTED_ERR_MSG } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
@@ -25,6 +25,22 @@ export function registerOAuthRoutes(app: Express) {
 
       if (!userInfo.openId) {
         res.status(400).json({ error: "openId missing from user info" });
+        return;
+      }
+
+      // Domain restriction: only @platestory.in emails allowed
+      const email = userInfo.email ?? "";
+      if (email && !email.toLowerCase().endsWith(`@${ALLOWED_EMAIL_DOMAIN}`)) {
+        res.status(403).send(`
+          <html><body style="font-family:system-ui;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#faf9f6;">
+            <div style="text-align:center;max-width:400px;padding:2rem;">
+              <h2 style="color:#333;">Access Restricted</h2>
+              <p style="color:#666;">Only <strong>@${ALLOWED_EMAIL_DOMAIN}</strong> email addresses can access Platestory LMS.</p>
+              <p style="color:#999;font-size:0.875rem;">Please sign in with your company email.</p>
+              <a href="/" style="color:#4a7c59;text-decoration:underline;">Back to Home</a>
+            </div>
+          </body></html>
+        `);
         return;
       }
 

@@ -6,7 +6,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Crown, Flame, Medal, Star, Trophy } from "lucide-react";
 
 const rankColors = ["text-amber-500", "text-gray-400", "text-amber-700"];
-const rankBgs = ["bg-amber-50", "bg-gray-50", "bg-amber-50/50"];
+const rankBgs = ["bg-amber-100", "bg-gray-100", "bg-amber-100/60"];
 
 export default function Leaderboard() {
   const { user } = useAuth();
@@ -22,7 +22,7 @@ export default function Leaderboard() {
 
         {/* Top 3 Podium */}
         {(leaderboard.data?.length ?? 0) >= 3 && (
-          <div className="grid grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto bg-gradient-to-b from-primary/5 to-transparent rounded-2xl p-6">
             {[1, 0, 2].map((idx) => {
               const entry = leaderboard.data![idx];
               const isFirst = idx === 0;
@@ -31,8 +31,8 @@ export default function Leaderboard() {
                   key={entry.id}
                   className={`flex flex-col items-center ${isFirst ? "order-2 -mt-4" : idx === 1 ? "order-1 mt-4" : "order-3 mt-4"}`}
                 >
-                  <div className={`relative mb-3 ${isFirst ? "scale-110" : ""}`}>
-                    <Avatar className={`h-16 w-16 border-2 ${isFirst ? "border-amber-400" : "border-border"}`}>
+                  <div className={`relative mb-3 ${isFirst ? "scale-125" : ""}`}>
+                    <Avatar className={`h-16 w-16 border-3 ${isFirst ? "border-amber-400 shadow-lg shadow-amber-200" : idx === 1 ? "border-gray-300" : "border-amber-600/40"}`}>
                       <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
                         {entry.name?.charAt(0).toUpperCase() ?? "?"}
                       </AvatarFallback>

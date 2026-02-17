@@ -2,7 +2,7 @@ import AppLayout from "@/components/AppLayout";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trpc } from "@/lib/trpc";
@@ -27,7 +27,6 @@ export default function Dashboard() {
   const notifs = trpc.notification.list.useQuery(undefined, { enabled: !!user });
   const badges = trpc.badge.myBadges.useQuery(undefined, { enabled: !!user });
 
-  // Check for new badges on load
   trpc.badge.checkAndAward.useMutation();
 
   const formatTime = (seconds: number) => {
@@ -37,7 +36,6 @@ export default function Dashboard() {
     return `${mins}m`;
   };
 
-  const enrolledCourseIds = new Set(enrollments.data?.map(e => e.courseId) ?? []);
   const inProgressEnrollments = enrollments.data?.filter(e => e.status !== "completed") ?? [];
   const courseMap = new Map(courses.data?.map(c => [c.id, c]) ?? []);
 
@@ -52,60 +50,52 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Continue your learning journey</p>
         </div>
 
-        {/* Stats Cards */}
+        {/* Vibrant Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="border-border/50">
-            <CardContent className="pt-5 pb-4 px-5">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Star className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.data?.points ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">Points</p>
-                </div>
+          <div className="stat-card gradient-bg">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <Star className="h-5 w-5 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border/50">
-            <CardContent className="pt-5 pb-4 px-5">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-orange-100 flex items-center justify-center shrink-0">
-                  <Flame className="h-4 w-4 text-orange-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.data?.streakDays ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">Day Streak</p>
-                </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.data?.points ?? 0}</p>
+                <p className="text-xs text-white/70">Points</p>
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border/50">
-            <CardContent className="pt-5 pb-4 px-5">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{stats.data?.completedCourses ?? 0}</p>
-                  <p className="text-xs text-muted-foreground">Completed</p>
-                </div>
+            </div>
+          </div>
+          <div className="stat-card gradient-bg-warm">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <Flame className="h-5 w-5 text-white" />
               </div>
-            </CardContent>
-          </Card>
-          <Card className="border-border/50">
-            <CardContent className="pt-5 pb-4 px-5">
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                  <Clock className="h-4 w-4 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{formatTime(stats.data?.totalTimeSpentSec ?? 0)}</p>
-                  <p className="text-xs text-muted-foreground">Time Spent</p>
-                </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.data?.streakDays ?? 0}</p>
+                <p className="text-xs text-white/70">Day Streak</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+          <div className="stat-card gradient-bg-success">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.data?.completedCourses ?? 0}</p>
+                <p className="text-xs text-white/70">Completed</p>
+              </div>
+            </div>
+          </div>
+          <div className="stat-card gradient-bg-violet">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <Clock className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{formatTime(stats.data?.totalTimeSpentSec ?? 0)}</p>
+                <p className="text-xs text-white/70">Time Spent</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
@@ -139,25 +129,25 @@ export default function Dashboard() {
                     if (!course) return null;
                     return (
                       <Link key={enrollment.id} href={`/courses/${course.id}`}>
-                        <Card className="border-border/50 hover:shadow-md transition-all cursor-pointer group">
+                        <Card className="border-border/50 card-hover cursor-pointer group">
                           <CardContent className="p-4">
                             <div className="flex items-center gap-4">
-                              <div className="h-14 w-14 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                              <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0 group-hover:from-primary/30 group-hover:to-accent/30 transition-all">
                                 <BookOpen className="h-6 w-6 text-primary" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
                                   <h3 className="font-medium text-sm truncate">{course.title}</h3>
                                   {course.mode === "micro" && (
-                                    <Badge variant="secondary" className="text-[10px] shrink-0">Micro</Badge>
+                                    <Badge variant="secondary" className="text-[10px] shrink-0 bg-amber-100 text-amber-700">Micro</Badge>
                                   )}
                                   {course.mode === "deep" && (
-                                    <Badge variant="secondary" className="text-[10px] shrink-0">Deep Dive</Badge>
+                                    <Badge variant="secondary" className="text-[10px] shrink-0 bg-blue-100 text-blue-700">Deep Dive</Badge>
                                   )}
                                 </div>
                                 <div className="flex items-center gap-3">
-                                  <Progress value={enrollment.progress} className="h-1.5 flex-1" />
-                                  <span className="text-xs text-muted-foreground shrink-0">{enrollment.progress}%</span>
+                                  <Progress value={enrollment.progress} className="h-2 flex-1" />
+                                  <span className="text-xs font-medium text-primary shrink-0">{enrollment.progress}%</span>
                                 </div>
                               </div>
                             </div>
@@ -185,7 +175,7 @@ export default function Dashboard() {
                   {badges.data?.slice(0, 6).map((badge) => (
                     <div
                       key={badge.id}
-                      className="glass-card px-4 py-3 flex items-center gap-3"
+                      className="glass-card px-4 py-3 flex items-center gap-3 card-hover"
                     >
                       <span className="text-2xl">{badge.icon}</span>
                       <div>
@@ -203,7 +193,9 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Notifications</h2>
-              <Bell className="h-4 w-4 text-muted-foreground" />
+              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Bell className="h-4 w-4 text-primary" />
+              </div>
             </div>
             <Card className="border-border/50">
               <ScrollArea className="h-[400px]">
@@ -219,7 +211,7 @@ export default function Dashboard() {
                         <div
                           key={notif.id}
                           className={`p-3 rounded-lg text-sm transition-colors ${
-                            notif.isRead ? "bg-transparent" : "bg-primary/5"
+                            notif.isRead ? "bg-transparent hover:bg-accent/30" : "bg-primary/5"
                           }`}
                         >
                           <div className="flex items-start gap-2">

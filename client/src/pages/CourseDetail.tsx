@@ -73,7 +73,7 @@ export default function CourseDetail() {
             {/* Course Header */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-3">
-                <Badge variant="outline">{c.mode === "micro" ? "Micro-Learning" : c.mode === "deep" ? "Deep Dive" : "Standard"}</Badge>
+                <Badge variant="outline" className={c.mode === 'micro' ? 'border-amber-400 text-amber-700 bg-amber-50' : c.mode === 'deep' ? 'border-blue-400 text-blue-700 bg-blue-50' : ''}>{c.mode === "micro" ? "Micro-Learning" : c.mode === "deep" ? "Deep Dive" : "Standard"}</Badge>
                 <Badge variant="secondary" className="capitalize">{c.difficulty}</Badge>
                 {c.isMandatory && <Badge className="bg-destructive text-destructive-foreground">Mandatory</Badge>}
               </div>
@@ -176,8 +176,8 @@ export default function CourseDetail() {
                 {c.thumbnailUrl ? (
                   <img src={c.thumbnailUrl} alt={c.title} className="w-full h-40 object-cover rounded-lg mb-4" />
                 ) : (
-                  <div className="w-full h-40 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg mb-4 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-primary/30" />
+                  <div className={`w-full h-40 rounded-lg mb-4 flex items-center justify-center ${c.mode === 'micro' ? 'bg-gradient-to-br from-amber-400 to-orange-500' : c.mode === 'deep' ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gradient-to-br from-primary to-primary/70'}`}>
+                    <BookOpen className="h-12 w-12 text-white/40" />
                   </div>
                 )}
 

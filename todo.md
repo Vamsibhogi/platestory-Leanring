@@ -66,4 +66,8 @@
 - [x] Auth tests (me, logout)
 - [x] Access control tests (admin vs user for all admin procedures)
 - [x] Input validation tests
-- [x] 36 tests passing
+- [x] 38 tests passing
+
+## Iteration 2 - User Feedback
+- [x] Add @platestory.in email domain restriction for access
+- [x] Make the design more colorful and vibrant (gradients, richer colors, visual depth)
