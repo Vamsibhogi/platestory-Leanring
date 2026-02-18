@@ -14,9 +14,8 @@ const upload = multer({
 
 const router = Router();
 
-// Parse JSON bodies for video-complete endpoint
+// JSON parser for video-complete endpoint (applied per-route to avoid conflict with multer)
 const jsonParser = express.json();
-router.use(jsonParser);
 
 // In-memory store for tracking upload sessions
 const uploadSessions = new Map<string, {
@@ -105,7 +104,7 @@ router.post("/video-chunk", requireAdmin, upload.single("chunk"), async (req: an
 });
 
 // POST /api/upload/video-complete - Assemble chunks and upload to S3
-router.post("/video-complete", requireAdmin, async (req: any, res) => {
+router.post("/video-complete", jsonParser, requireAdmin, async (req: any, res) => {
   try {
     const { sessionId } = req.body;
 

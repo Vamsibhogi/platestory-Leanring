@@ -101,3 +101,9 @@
 - [x] Implement chunked upload to bypass proxy size limits (5MB chunks)
 - [x] Update tests for chunked upload (10 new tests, 53 total passing)
 - [x] Increased max file size to 500MB (from 200MB)
+
+## Iteration 9 - Bug Fix
+- [x] Fix: Assembly failed (503) error - middleware conflict between express.json() and multer
+- [x] Applied JSON parser only to /video-complete endpoint to avoid consuming request body before multer
+- [x] All 53 tests passing
+- [x] Verified UI loads correctly and upload buttons are functional
