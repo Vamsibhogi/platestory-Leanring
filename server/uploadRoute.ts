@@ -1,3 +1,4 @@
+// Video upload route v2.0 - Production ready with chunked upload
 import express, { Router } from "express";
 import multer from "multer";
 import { storagePut } from "./storage";

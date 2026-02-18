@@ -116,3 +116,8 @@
 - [x] All 7 upload route tests passing (50 total tests)
 - [x] Server running cleanly without errors
 - [x] **Ready to publish to cymllc.com production**
+
+## Iteration 11 - Force New Checkpoint
+- [x] Add trivial code comment to force git commit
+- [ ] Save new checkpoint with publish button
+- [ ] User publishes to cymllc.com production
