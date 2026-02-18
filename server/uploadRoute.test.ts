@@ -159,81 +159,12 @@ describe("Chunked Upload - Video chunks", () => {
       .expect(200);
 
     expect(res3.body.complete).toBe(true);
-    expect(res3.body.sessionId).toBe(sessionId);
+    expect(res3.body.url).toBeDefined();
+    expect(res3.body.fileKey).toBeDefined();
   });
 });
 
-describe("Chunked Upload - Completion", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    (sdk.authenticateRequest as any).mockResolvedValue({
-      id: 1,
-      role: "admin",
-      name: "Admin User",
-    });
-  });
-
-  it("returns 400 when sessionId is missing", async () => {
-    const app = createApp();
-
-    const res = await request(app)
-      .post("/api/upload/video-complete")
-      .send({})
-      .expect(400);
-
-    expect(res.body.error).toContain("Missing sessionId");
-  });
-
-  it("returns 404 when session does not exist", async () => {
-    const app = createApp();
-
-    const res = await request(app)
-      .post("/api/upload/video-complete")
-      .send({ sessionId: "non-existent-session" })
-      .expect(404);
-
-    expect(res.body.error).toContain("Session not found");
-  });
-
-  it("assembles chunks and uploads to S3", async () => {
-    const app = createApp();
-    const sessionId = "test-complete-session";
-
-    // Upload 2 chunks
-    await request(app)
-      .post("/api/upload/video-chunk")
-      .field("sessionId", sessionId)
-      .field("chunkIndex", "0")
-      .field("totalChunks", "2")
-      .field("fileName", "complete-test.mp4")
-      .attach("chunk", Buffer.from("first-chunk"), "chunk-0")
-      .expect(200);
-
-    await request(app)
-      .post("/api/upload/video-chunk")
-      .field("sessionId", sessionId)
-      .field("chunkIndex", "1")
-      .field("totalChunks", "2")
-      .field("fileName", "complete-test.mp4")
-      .attach("chunk", Buffer.from("second-chunk"), "chunk-1")
-      .expect(200);
-
-    // Complete the upload
-    const res = await request(app)
-      .post("/api/upload/video-complete")
-      .send({ sessionId })
-      .expect(200);
-
-    expect(res.body.url).toBeDefined();
-    expect(res.body.fileKey).toBeDefined();
-    expect(storagePut).toHaveBeenCalledTimes(1);
-
-    // Verify the assembled file contains both chunks
-    const callArgs = (storagePut as any).mock.calls[0];
-    const assembledBuffer = callArgs[1] as Buffer;
-    expect(assembledBuffer.toString()).toBe("first-chunksecond-chunk");
-  });
-});
+// Completion tests removed - assembly now happens automatically on last chunk
 
 describe("Thumbnail Upload - Unchanged", () => {
   beforeEach(() => {

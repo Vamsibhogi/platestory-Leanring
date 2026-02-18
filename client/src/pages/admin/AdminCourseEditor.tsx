@@ -45,7 +45,7 @@ async function uploadVideoFileChunked(
   const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
-  console.log(`[ChunkedUpload] Starting upload: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) in ${totalChunks} chunks`);
+  console.log(`[ChunkedUpload] ===== VERSION 2.0 - NO SEPARATE COMPLETE ENDPOINT ===== Starting upload: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) in ${totalChunks} chunks`);
 
   // Upload each chunk sequentially
   for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
@@ -73,33 +73,22 @@ async function uploadVideoFileChunked(
 
     const data = await response.json();
     
-    // Update progress (90% for chunk uploads, 10% for assembly + saving)
-    const uploadProgress = Math.floor(((chunkIndex + 1) / totalChunks) * 90);
+    // Check if this was the last chunk and assembly is complete
+    if (data.complete && data.url && data.fileKey) {
+      console.log(`[ChunkedUpload] Last chunk uploaded, file assembled and uploaded to S3: ${data.fileKey}`);
+      onProgress(100);
+      return { url: data.url, fileKey: data.fileKey };
+    }
+    
+    // Update progress (chunks are 90% of the work, last chunk does assembly)
+    const uploadProgress = Math.floor(((chunkIndex + 1) / totalChunks) * 100);
     onProgress(uploadProgress);
 
     console.log(`[ChunkedUpload] Chunk ${chunkIndex + 1}/${totalChunks} uploaded (${uploadProgress}%)`);
   }
 
-  // All chunks uploaded, now assemble and upload to S3
-  onProgress(92);
-  console.log(`[ChunkedUpload] All chunks uploaded, assembling file...`);
-
-  const completeResponse = await fetch("/api/upload/video-complete", {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ sessionId }),
-  });
-
-  if (!completeResponse.ok) {
-    const errorData = await completeResponse.json().catch(() => ({ error: completeResponse.statusText }));
-    throw new Error(errorData.error || `Assembly failed (${completeResponse.status})`);
-  }
-
-  const result = await completeResponse.json();
-  console.log(`[ChunkedUpload] Upload complete: ${result.fileKey}`);
-  
-  return result;
+  // This should never be reached since the last chunk returns the result
+  throw new Error("Upload completed but no result received");
 }
 
 export default function AdminCourseEditor() {

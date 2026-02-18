@@ -24,6 +24,8 @@ const uploadSessions = new Map<string, {
   receivedChunks: Set<number>;
   tempDir: string;
   createdAt: number;
+  url?: string;
+  fileKey?: string;
 }>();
 
 // Clean up stale sessions older than 1 hour
@@ -93,7 +95,43 @@ router.post("/video-chunk", requireAdmin, upload.single("chunk"), async (req: an
     // Check if all chunks are received
     if (session.receivedChunks.size === session.totalChunks) {
       console.log(`[Upload] All chunks received for session ${sessionId}, assembling file...`);
-      return res.json({ complete: true, sessionId });
+      
+      // Assemble chunks immediately
+      const chunks: Buffer[] = [];
+      for (let i = 0; i < session.totalChunks; i++) {
+        const chunkPath = path.join(session.tempDir, `chunk-${i}`);
+        const chunkData = await fs.readFile(chunkPath);
+        chunks.push(chunkData);
+      }
+
+      const completeFile = Buffer.concat(chunks);
+      const fileSizeMB = (completeFile.length / 1024 / 1024).toFixed(1);
+
+      console.log(`[Upload] Assembled file: ${session.fileName} (${fileSizeMB}MB), uploading to S3...`);
+
+      // Sanitize filename
+      const safeName = session.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const fileKey = `videos/${nanoid()}-${safeName}`;
+
+      // Determine content type
+      const ext = safeName.split(".").pop()?.toLowerCase();
+      const contentType = ext === "mp4" ? "video/mp4" : 
+                         ext === "webm" ? "video/webm" :
+                         ext === "mov" ? "video/quicktime" : "video/mp4";
+
+      // Upload to S3
+      const { url } = await storagePut(fileKey, completeFile, contentType);
+
+      console.log(`[Upload] Video uploaded successfully: ${fileKey}`);
+
+      // Store URL in session for video-complete endpoint (in case frontend calls it)
+      session.url = url;
+      session.fileKey = fileKey;
+
+      // Clean up temp files
+      await fs.rm(session.tempDir, { recursive: true, force: true }).catch(console.error);
+
+      return res.json({ complete: true, url, fileKey });
     }
 
     return res.json({ complete: false, sessionId, received: session.receivedChunks.size });
@@ -115,6 +153,13 @@ router.post("/video-complete", jsonParser, requireAdmin, async (req: any, res) =
     const session = uploadSessions.get(sessionId);
     if (!session) {
       return res.status(404).json({ error: "Session not found or expired" });
+    }
+
+    // If URL already exists (last chunk already assembled), return it
+    if (session.url && session.fileKey) {
+      console.log(`[Upload] Returning already-uploaded video: ${session.fileKey}`);
+      uploadSessions.delete(sessionId); // Clean up session
+      return res.json({ url: session.url, fileKey: session.fileKey });
     }
 
     // Verify all chunks are present
