@@ -14,10 +14,13 @@ export default function AdminUsers() {
   const utils = trpc.useUtils();
   const [search, setSearch] = useState("");
 
-  const toggleRoleMutation = trpc.user.updateProfile.useMutation({
+  const setRoleMutation = trpc.user.setRole.useMutation({
     onSuccess: () => {
       utils.user.list.invalidate();
       toast.success("User role updated!");
+    },
+    onError: (err) => {
+      toast.error(`Failed to update role: ${err.message}`);
     },
   });
 
@@ -70,10 +73,11 @@ export default function AdminUsers() {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8"
+                  disabled={setRoleMutation.isPending}
                   onClick={() => {
                     const newRole = user.role === "admin" ? "user" : "admin";
-                    if (confirm(`Change ${user.name}'s role to ${newRole}?`)) {
-                      toggleRoleMutation.mutate({ department: newRole }); // Role changes need SQL
+                    if (confirm(`Change ${user.name ?? "this user"}'s role to ${newRole}?`)) {
+                      setRoleMutation.mutate({ userId: user.id, role: newRole });
                     }
                   }}
                   title={user.role === "admin" ? "Remove admin" : "Make admin"}

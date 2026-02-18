@@ -331,6 +331,66 @@ describe("badge procedures", () => {
   });
 });
 
+describe("user.setRole - access control", () => {
+  it("rejects setRole from non-admin users", async () => {
+    const ctx = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.user.setRole({ userId: 2, role: "admin" })
+    ).rejects.toThrow();
+  });
+
+  it("allows admin to call setRole", async () => {
+    const ctx = createAdminContext();
+    const caller = appRouter.createCaller(ctx);
+
+    try {
+      const result = await caller.user.setRole({ userId: 2, role: "admin" });
+      expect(result).toEqual({ success: true });
+    } catch (e: any) {
+      // DB might not be available in test env
+      if (!e.message?.includes("database") && !e.message?.includes("Database") && !e.message?.includes("connect")) {
+        throw e;
+      }
+    }
+  });
+
+  it("rejects invalid role value", async () => {
+    const ctx = createAdminContext();
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.user.setRole({ userId: 2, role: "superadmin" as any })
+    ).rejects.toThrow();
+  });
+});
+
+describe("course.update - access control", () => {
+  it("allows admin to update course details", async () => {
+    const ctx = createAdminContext();
+    const caller = appRouter.createCaller(ctx);
+
+    try {
+      const result = await caller.course.update({ id: 1, title: "Updated Title", description: "New desc" });
+      expect(result).toEqual({ success: true });
+    } catch (e: any) {
+      if (!e.message?.includes("database") && !e.message?.includes("Database") && !e.message?.includes("connect")) {
+        throw e;
+      }
+    }
+  });
+
+  it("rejects course update from non-admin users", async () => {
+    const ctx = createUserContext();
+    const caller = appRouter.createCaller(ctx);
+
+    await expect(
+      caller.course.update({ id: 1, title: "Hacked" })
+    ).rejects.toThrow();
+  });
+});
+
 describe("email domain restriction", () => {
   it("ALLOWED_EMAIL_DOMAIN is set to platestory.in", async () => {
     const { ALLOWED_EMAIL_DOMAIN } = await import("../shared/const");

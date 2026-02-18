@@ -34,6 +34,16 @@ export const appRouter = router({
         const { eq } = await import("drizzle-orm");
         await dbInstance.update(users).set(input).where(eq(users.id, ctx.user.id));
       }),
+    setRole: adminProcedure
+      .input(z.object({ userId: z.number(), role: z.enum(["user", "admin"]) }))
+      .mutation(async ({ input }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) return;
+        const { users } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        await dbInstance.update(users).set({ role: input.role }).where(eq(users.id, input.userId));
+        return { success: true };
+      }),
     stats: protectedProcedure.query(async ({ ctx }) => {
       const enrollmentList = await db.getEnrollmentsByUser(ctx.user.id);
       const badgeList = await db.getUserBadges(ctx.user.id);

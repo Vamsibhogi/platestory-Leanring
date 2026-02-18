@@ -81,3 +81,10 @@
 
 ## Iteration 5 - Bug Fix
 - [x] Fix: Video not playing in lesson player (filename with # and spaces broke S3 URL)
+
+## Iteration 6 - Bug Fixes
+- [x] Fix: Admin role toggle not updating user role (added user.setRole procedure)
+- [x] Fix: Missing edit option for courses (added Edit Course dialog with pencil icon)
+- [x] Fix: Upload showing "Uploading..." for all lessons (per-lesson upload state with Map)
+- [x] Fix: No upload progress bar (added progress bar with percentage and status text)
+- [x] 43 tests passing

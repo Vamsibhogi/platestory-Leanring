@@ -18,6 +18,7 @@ import {
   Edit,
   Eye,
   EyeOff,
+  Pencil,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -25,27 +26,121 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
+type CourseForm = {
+  title: string;
+  description: string;
+  category: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  mode: "micro" | "deep" | "standard";
+  estimatedMinutes: number;
+  pointsReward: number;
+  isMandatory: boolean;
+};
+
+const defaultForm: CourseForm = {
+  title: "",
+  description: "",
+  category: "",
+  difficulty: "beginner",
+  mode: "standard",
+  estimatedMinutes: 0,
+  pointsReward: 10,
+  isMandatory: false,
+};
+
+function CourseFormFields({ form, setForm }: { form: CourseForm; setForm: (fn: (f: CourseForm) => CourseForm) => void }) {
+  return (
+    <>
+      <div>
+        <Label>Title</Label>
+        <Input value={form.title} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} required />
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea value={form.description} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} rows={3} />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Category</Label>
+          <Input value={form.category} onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Sales, Safety" />
+        </div>
+        <div>
+          <Label>Difficulty</Label>
+          <select
+            value={form.difficulty}
+            onChange={(e) => setForm(f => ({ ...f, difficulty: e.target.value as any }))}
+            className="w-full h-10 rounded-lg border bg-background px-3 text-sm"
+          >
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Learning Mode</Label>
+          <select
+            value={form.mode}
+            onChange={(e) => setForm(f => ({ ...f, mode: e.target.value as any }))}
+            className="w-full h-10 rounded-lg border bg-background px-3 text-sm"
+          >
+            <option value="standard">Standard</option>
+            <option value="micro">Micro-Learning</option>
+            <option value="deep">Deep Dive</option>
+          </select>
+        </div>
+        <div>
+          <Label>Est. Minutes</Label>
+          <Input type="number" value={form.estimatedMinutes} onChange={(e) => setForm(f => ({ ...f, estimatedMinutes: parseInt(e.target.value) || 0 }))} />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Points Reward</Label>
+          <Input type="number" value={form.pointsReward} onChange={(e) => setForm(f => ({ ...f, pointsReward: parseInt(e.target.value) || 10 }))} />
+        </div>
+        <div className="flex items-end">
+          <label className="flex items-center gap-2 h-10">
+            <input
+              type="checkbox"
+              checked={form.isMandatory}
+              onChange={(e) => setForm(f => ({ ...f, isMandatory: e.target.checked }))}
+              className="rounded"
+            />
+            <span className="text-sm">Mandatory</span>
+          </label>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export default function AdminCourses() {
   const courses = trpc.course.listAll.useQuery();
   const utils = trpc.useUtils();
   const [showCreate, setShowCreate] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    category: "",
-    difficulty: "beginner" as "beginner" | "intermediate" | "advanced",
-    mode: "standard" as "micro" | "deep" | "standard",
-    estimatedMinutes: 0,
-    pointsReward: 10,
-    isMandatory: false,
-  });
+  const [editingCourse, setEditingCourse] = useState<number | null>(null);
+  const [form, setForm] = useState<CourseForm>({ ...defaultForm });
+  const [editForm, setEditForm] = useState<CourseForm>({ ...defaultForm });
 
   const createMutation = trpc.course.create.useMutation({
     onSuccess: () => {
       utils.course.listAll.invalidate();
       setShowCreate(false);
-      setForm({ title: "", description: "", category: "", difficulty: "beginner", mode: "standard", estimatedMinutes: 0, pointsReward: 10, isMandatory: false });
+      setForm({ ...defaultForm });
       toast.success("Course created!");
+    },
+  });
+
+  const updateMutation = trpc.course.update.useMutation({
+    onSuccess: () => {
+      utils.course.listAll.invalidate();
+      setEditingCourse(null);
+      toast.success("Course updated!");
+    },
+    onError: (err) => {
+      toast.error(`Failed to update: ${err.message}`);
     },
   });
 
@@ -62,6 +157,20 @@ export default function AdminCourses() {
       toast.success("Course deleted!");
     },
   });
+
+  const openEditDialog = (course: any) => {
+    setEditForm({
+      title: course.title ?? "",
+      description: course.description ?? "",
+      category: course.category ?? "",
+      difficulty: course.difficulty ?? "beginner",
+      mode: course.mode ?? "standard",
+      estimatedMinutes: course.estimatedMinutes ?? 0,
+      pointsReward: course.pointsReward ?? 10,
+      isMandatory: course.isMandatory ?? false,
+    });
+    setEditingCourse(course.id);
+  };
 
   return (
     <AdminLayout>
@@ -88,67 +197,7 @@ export default function AdminCourses() {
               }}
               className="space-y-4"
             >
-              <div>
-                <Label>Title</Label>
-                <Input value={form.title} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} required />
-              </div>
-              <div>
-                <Label>Description</Label>
-                <Textarea value={form.description} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} rows={3} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Category</Label>
-                  <Input value={form.category} onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Sales, Safety" />
-                </div>
-                <div>
-                  <Label>Difficulty</Label>
-                  <select
-                    value={form.difficulty}
-                    onChange={(e) => setForm(f => ({ ...f, difficulty: e.target.value as any }))}
-                    className="w-full h-10 rounded-lg border bg-background px-3 text-sm"
-                  >
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Learning Mode</Label>
-                  <select
-                    value={form.mode}
-                    onChange={(e) => setForm(f => ({ ...f, mode: e.target.value as any }))}
-                    className="w-full h-10 rounded-lg border bg-background px-3 text-sm"
-                  >
-                    <option value="standard">Standard</option>
-                    <option value="micro">Micro-Learning</option>
-                    <option value="deep">Deep Dive</option>
-                  </select>
-                </div>
-                <div>
-                  <Label>Est. Minutes</Label>
-                  <Input type="number" value={form.estimatedMinutes} onChange={(e) => setForm(f => ({ ...f, estimatedMinutes: parseInt(e.target.value) || 0 }))} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Points Reward</Label>
-                  <Input type="number" value={form.pointsReward} onChange={(e) => setForm(f => ({ ...f, pointsReward: parseInt(e.target.value) || 10 }))} />
-                </div>
-                <div className="flex items-end">
-                  <label className="flex items-center gap-2 h-10">
-                    <input
-                      type="checkbox"
-                      checked={form.isMandatory}
-                      onChange={(e) => setForm(f => ({ ...f, isMandatory: e.target.checked }))}
-                      className="rounded"
-                    />
-                    <span className="text-sm">Mandatory</span>
-                  </label>
-                </div>
-              </div>
+              <CourseFormFields form={form} setForm={setForm} />
               <Button type="submit" className="w-full" disabled={createMutation.isPending}>
                 {createMutation.isPending ? "Creating..." : "Create Course"}
               </Button>
@@ -156,6 +205,28 @@ export default function AdminCourses() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Edit Course Dialog */}
+      <Dialog open={editingCourse !== null} onOpenChange={(open) => { if (!open) setEditingCourse(null); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Course</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (editingCourse === null) return;
+              updateMutation.mutate({ id: editingCourse, ...editForm });
+            }}
+            className="space-y-4"
+          >
+            <CourseFormFields form={editForm} setForm={setEditForm} />
+            <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Course List */}
       <div className="space-y-3">
@@ -174,7 +245,8 @@ export default function AdminCourses() {
                 </div>
                 <p className="text-xs text-muted-foreground truncate">{course.description ?? "No description"}</p>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
+                {/* Publish/Unpublish */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -184,20 +256,33 @@ export default function AdminCourses() {
                 >
                   {course.isPublished ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
                 </Button>
+                {/* Edit Course Details */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => openEditDialog(course)}
+                  title="Edit course details"
+                >
+                  <Pencil className="h-4 w-4 text-blue-600" />
+                </Button>
+                {/* Manage Lessons & Quizzes */}
                 <Link href={`/admin/courses/${course.id}`}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" title="Manage lessons & quizzes">
                     <Edit className="h-4 w-4" />
                   </Button>
                 </Link>
+                {/* Delete */}
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 text-destructive hover:text-destructive"
                   onClick={() => {
-                    if (confirm("Delete this course?")) {
+                    if (confirm("Delete this course? This will also delete all lessons and quizzes.")) {
                       deleteMutation.mutate({ id: course.id });
                     }
                   }}
+                  title="Delete course"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
