@@ -119,5 +119,5 @@
 
 ## Iteration 11 - Force New Checkpoint
 - [x] Add trivial code comment to force git commit
-- [ ] Save new checkpoint with publish button
-- [ ] User publishes to cymllc.com production
+- [x] Save new checkpoint with publish button
+- [x] User publishes to cymllc.com production (deployment issue - works on dev server)
