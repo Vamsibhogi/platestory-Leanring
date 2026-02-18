@@ -31,54 +31,75 @@ import { toast } from "sonner";
 
 type UploadState = {
   progress: number; // 0-100
-  status: "idle" | "uploading" | "saving" | "done" | "error";
+  status: "idle" | "uploading" | "assembling" | "saving" | "done" | "error";
   errorMessage?: string;
 };
 
-// Upload file via multipart form data to /api/upload/video
-async function uploadVideoFile(
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (well below proxy limit)
+
+// Upload file in chunks to bypass proxy body size limits
+async function uploadVideoFileChunked(
   file: File,
   onProgress: (percent: number) => void
 ): Promise<{ url: string; fileKey: string }> {
-  return new Promise((resolve, reject) => {
+  const sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+
+  console.log(`[ChunkedUpload] Starting upload: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB) in ${totalChunks} chunks`);
+
+  // Upload each chunk sequentially
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+    const start = chunkIndex * CHUNK_SIZE;
+    const end = Math.min(start + CHUNK_SIZE, file.size);
+    const chunk = file.slice(start, end);
+
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("chunk", chunk);
+    formData.append("sessionId", sessionId);
+    formData.append("chunkIndex", chunkIndex.toString());
+    formData.append("totalChunks", totalChunks.toString());
+    formData.append("fileName", file.name);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/upload/video");
-    xhr.withCredentials = true;
+    const response = await fetch("/api/upload/video-chunk", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const percent = Math.round((e.loaded / e.total) * 100);
-        onProgress(percent);
-      }
-    };
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(errorData.error || `Chunk ${chunkIndex + 1} upload failed (${response.status})`);
+    }
 
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const data = JSON.parse(xhr.responseText);
-          resolve(data);
-        } catch {
-          reject(new Error("Invalid response from server"));
-        }
-      } else {
-        let errorMsg = `Upload failed (${xhr.status})`;
-        try {
-          const data = JSON.parse(xhr.responseText);
-          if (data.error) errorMsg = data.error;
-        } catch { /* ignore */ }
-        reject(new Error(errorMsg));
-      }
-    };
+    const data = await response.json();
+    
+    // Update progress (90% for chunk uploads, 10% for assembly + saving)
+    const uploadProgress = Math.floor(((chunkIndex + 1) / totalChunks) * 90);
+    onProgress(uploadProgress);
 
-    xhr.onerror = () => reject(new Error("Network error during upload"));
-    xhr.ontimeout = () => reject(new Error("Upload timed out"));
-    xhr.timeout = 5 * 60 * 1000; // 5 minute timeout
+    console.log(`[ChunkedUpload] Chunk ${chunkIndex + 1}/${totalChunks} uploaded (${uploadProgress}%)`);
+  }
 
-    xhr.send(formData);
+  // All chunks uploaded, now assemble and upload to S3
+  onProgress(92);
+  console.log(`[ChunkedUpload] All chunks uploaded, assembling file...`);
+
+  const completeResponse = await fetch("/api/upload/video-complete", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sessionId }),
   });
+
+  if (!completeResponse.ok) {
+    const errorData = await completeResponse.json().catch(() => ({ error: completeResponse.statusText }));
+    throw new Error(errorData.error || `Assembly failed (${completeResponse.status})`);
+  }
+
+  const result = await completeResponse.json();
+  console.log(`[ChunkedUpload] Upload complete: ${result.fileKey}`);
+  
+  return result;
 }
 
 export default function AdminCourseEditor() {
@@ -149,18 +170,18 @@ export default function AdminCourseEditor() {
   }, []);
 
   const handleVideoUpload = useCallback(async (lessonId: number, file: File) => {
-    // Validate file size (max 200MB)
-    if (file.size > 200 * 1024 * 1024) {
-      toast.error("File too large. Maximum size is 200MB.");
+    // Validate file size (max 500MB)
+    if (file.size > 500 * 1024 * 1024) {
+      toast.error("File too large. Maximum size is 500MB.");
       return;
     }
 
     setUploadState(lessonId, { status: "uploading", progress: 0 });
 
     try {
-      // Step 1: Upload to S3 via multipart form data with real progress tracking
-      const result = await uploadVideoFile(file, (percent) => {
-        setUploadState(lessonId, { progress: Math.min(percent, 95), status: "uploading" });
+      // Step 1: Upload file in chunks with real progress tracking
+      const result = await uploadVideoFileChunked(file, (percent) => {
+        setUploadState(lessonId, { progress: percent, status: percent >= 90 ? "assembling" : "uploading" });
       });
 
       // Step 2: Save URL to lesson
@@ -194,7 +215,8 @@ export default function AdminCourseEditor() {
 
   const getUploadStatusText = (state: UploadState) => {
     switch (state.status) {
-      case "uploading": return `Uploading to cloud... ${state.progress}%`;
+      case "uploading": return `Uploading chunks... ${state.progress}%`;
+      case "assembling": return `Assembling file... ${state.progress}%`;
       case "saving": return "Saving to lesson...";
       case "done": return "Upload complete!";
       case "error": return state.errorMessage || "Upload failed";

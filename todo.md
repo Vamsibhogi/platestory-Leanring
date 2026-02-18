@@ -95,3 +95,9 @@
 - [x] Real upload progress tracking via XMLHttpRequest
 - [x] Added "Replace" button for re-uploading videos to existing lessons
 - [x] 52 tests passing (9 new upload route tests)
+
+## Iteration 8 - Bug Fix
+- [x] Fix: HTTP 413 error during video upload (nginx proxy body size limit)
+- [x] Implement chunked upload to bypass proxy size limits (5MB chunks)
+- [x] Update tests for chunked upload (10 new tests, 53 total passing)
+- [x] Increased max file size to 500MB (from 200MB)
