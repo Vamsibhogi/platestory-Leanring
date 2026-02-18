@@ -87,4 +87,11 @@
 - [x] Fix: Missing edit option for courses (added Edit Course dialog with pencil icon)
 - [x] Fix: Upload showing "Uploading..." for all lessons (per-lesson upload state with Map)
 - [x] Fix: No upload progress bar (added progress bar with percentage and status text)
-- [x] 43 tests passing
+- [x] 43 tests passing → now 52 tests
+
+## Iteration 7 - Bug Fix
+- [x] Fix: Video not visible after upload progress bar reaches 100% (replaced base64 tRPC with multipart upload)
+- [x] Added dedicated /api/upload/video endpoint with multer for reliable file uploads
+- [x] Real upload progress tracking via XMLHttpRequest
+- [x] Added "Replace" button for re-uploading videos to existing lessons
+- [x] 52 tests passing (9 new upload route tests)

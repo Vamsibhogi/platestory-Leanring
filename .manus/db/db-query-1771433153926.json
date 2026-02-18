@@ -1,0 +1,52 @@
+{
+  "query": "SELECT id, title, type, IF(videoUrl IS NULL, 'IS_NULL', CONCAT('URL:', LEFT(videoUrl, 80))) as video_status, IF(videoKey IS NULL, 'IS_NULL', CONCAT('KEY:', LEFT(videoKey, 80))) as key_status FROM lessons ORDER BY id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, title, type, IF(videoUrl IS NULL, 'IS_NULL', CONCAT('URL:', LEFT(videoUrl, 80))) as video_status, IF(videoKey IS NULL, 'IS_NULL', CONCAT('KEY:', LEFT(videoKey, 80))) as key_status FROM lessons ORDER BY id DESC;",
+  "rows": [
+    {
+      "id": "30004",
+      "title": "Understanding the Customer Journey for Event Cakes 🎂",
+      "type": "video",
+      "video_status": "IS_NULL",
+      "key_status": "IS_NULL"
+    },
+    {
+      "id": "30003",
+      "title": "3. Who We Serve: Understanding Our Customized Cake Offerings and Customer Expectations 🎂",
+      "type": "video",
+      "video_status": "IS_NULL",
+      "key_status": "IS_NULL"
+    },
+    {
+      "id": "30002",
+      "title": "2. What We Never Promise: Mastering Customer Expectations in Cake Design 🎂",
+      "type": "video",
+      "video_status": "IS_NULL",
+      "key_status": "IS_NULL"
+    },
+    {
+      "id": "30001",
+      "title": "Mastering Brand Voice: Creating a Warm and Reliable Customer Experience",
+      "type": "video",
+      "video_status": "IS_NULL",
+      "key_status": "IS_NULL"
+    },
+    {
+      "id": "3",
+      "title": "test 1",
+      "type": "video",
+      "video_status": "URL:https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/9Gd",
+      "key_status": "KEY:videos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4"
+    },
+    {
+      "id": "2",
+      "title": "test 2",
+      "type": "video",
+      "video_status": "URL:https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/G9_",
+      "key_status": "KEY:videos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\ttype\tvideo_status\tkey_status\n30004\tUnderstanding the Customer Journey for Event Cakes 🎂\tvideo\tIS_NULL\tIS_NULL\n30003\t3. Who We Serve: Understanding Our Customized Cake Offerings and Customer Expectations 🎂\tvideo\tIS_NULL\tIS_NULL\n30002\t2. What We Never Promise: Mastering Customer Expectations in Cake Design 🎂\tvideo\tIS_NULL\tIS_NULL\n30001\tMastering Brand Voice: Creating a Warm and Reliable Customer Experience\tvideo\tIS_NULL\tIS_NULL\n3\ttest 1\tvideo\tURL:https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/9Gd\tKEY:videos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4\n2\ttest 2\tvideo\tURL:https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/G9_\tKEY:videos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4\n",
+  "stderr": "",
+  "execution_time_ms": 1507
+}

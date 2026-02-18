@@ -1,0 +1,64 @@
+{
+  "query": "SELECT id, courseId, title, type, videoUrl, videoKey, videoDurationSec FROM lessons ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway04.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 47pCq5NGHGJeBvC.92834fb5c54d --database KeFY3JWWo4FiRjgKgB47TN --execute SELECT id, courseId, title, type, videoUrl, videoKey, videoDurationSec FROM lessons ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "30004",
+      "courseId": "30001",
+      "title": "Understanding the Customer Journey for Event Cakes 🎂",
+      "type": "video",
+      "videoUrl": "NULL",
+      "videoKey": "NULL",
+      "videoDurationSec": "0"
+    },
+    {
+      "id": "30003",
+      "courseId": "30001",
+      "title": "3. Who We Serve: Understanding Our Customized Cake Offerings and Customer Expectations 🎂",
+      "type": "video",
+      "videoUrl": "NULL",
+      "videoKey": "NULL",
+      "videoDurationSec": "0"
+    },
+    {
+      "id": "30002",
+      "courseId": "30001",
+      "title": "2. What We Never Promise: Mastering Customer Expectations in Cake Design 🎂",
+      "type": "video",
+      "videoUrl": "NULL",
+      "videoKey": "NULL",
+      "videoDurationSec": "0"
+    },
+    {
+      "id": "30001",
+      "courseId": "30001",
+      "title": "Mastering Brand Voice: Creating a Warm and Reliable Customer Experience",
+      "type": "video",
+      "videoUrl": "NULL",
+      "videoKey": "NULL",
+      "videoDurationSec": "0"
+    },
+    {
+      "id": "3",
+      "courseId": "1",
+      "title": "test 1",
+      "type": "video",
+      "videoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4",
+      "videoKey": "videos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4",
+      "videoDurationSec": "0"
+    },
+    {
+      "id": "2",
+      "courseId": "1",
+      "title": "test 2",
+      "type": "video",
+      "videoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4",
+      "videoKey": "videos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4",
+      "videoDurationSec": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcourseId\ttitle\ttype\tvideoUrl\tvideoKey\tvideoDurationSec\n30004\t30001\tUnderstanding the Customer Journey for Event Cakes 🎂\tvideo\tNULL\tNULL\t0\n30003\t30001\t3. Who We Serve: Understanding Our Customized Cake Offerings and Customer Expectations 🎂\tvideo\tNULL\tNULL\t0\n30002\t30001\t2. What We Never Promise: Mastering Customer Expectations in Cake Design 🎂\tvideo\tNULL\tNULL\t0\n30001\t30001\tMastering Brand Voice: Creating a Warm and Reliable Customer Experience\tvideo\tNULL\tNULL\t0\n3\t1\ttest 1\tvideo\thttps://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4\tvideos/9Gd0xyT_KjA5wZr8tiAXF-_1_Custom_Cakes.mp4\t0\n2\t1\ttest 2\tvideo\thttps://d2xsxph8kpxj0f.cloudfront.net/92713580/KeFY3JWWo4FiRjgKgB47TN/videos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4\tvideos/G9_jDgiBySyMteeZiNRPy-WhatsApp_Video_2026-02-15_at_6.59.28_PM.mp4\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1518
+}

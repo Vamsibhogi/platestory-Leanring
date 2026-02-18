@@ -20,6 +20,7 @@ import {
   FileText,
   HelpCircle,
   Plus,
+  RotateCcw,
   Trash2,
   Upload,
   Video,
@@ -30,8 +31,55 @@ import { toast } from "sonner";
 
 type UploadState = {
   progress: number; // 0-100
-  status: "idle" | "reading" | "uploading" | "saving" | "done" | "error";
+  status: "idle" | "uploading" | "saving" | "done" | "error";
+  errorMessage?: string;
 };
+
+// Upload file via multipart form data to /api/upload/video
+async function uploadVideoFile(
+  file: File,
+  onProgress: (percent: number) => void
+): Promise<{ url: string; fileKey: string }> {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/upload/video");
+    xhr.withCredentials = true;
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const percent = Math.round((e.loaded / e.total) * 100);
+        onProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          resolve(data);
+        } catch {
+          reject(new Error("Invalid response from server"));
+        }
+      } else {
+        let errorMsg = `Upload failed (${xhr.status})`;
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.error) errorMsg = data.error;
+        } catch { /* ignore */ }
+        reject(new Error(errorMsg));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error during upload"));
+    xhr.ontimeout = () => reject(new Error("Upload timed out"));
+    xhr.timeout = 5 * 60 * 1000; // 5 minute timeout
+
+    xhr.send(formData);
+  });
+}
 
 export default function AdminCourseEditor() {
   const { id } = useParams<{ id: string }>();
@@ -87,7 +135,6 @@ export default function AdminCourseEditor() {
     },
   });
 
-  const uploadVideoMutation = trpc.upload.video.useMutation();
   const updateLessonMutation = trpc.lesson.update.useMutation({
     onSuccess: () => {
       utils.lesson.listByCourse.invalidate({ courseId });
@@ -102,50 +149,22 @@ export default function AdminCourseEditor() {
   }, []);
 
   const handleVideoUpload = useCallback(async (lessonId: number, file: File) => {
-    setUploadState(lessonId, { status: "reading", progress: 10 });
+    // Validate file size (max 200MB)
+    if (file.size > 200 * 1024 * 1024) {
+      toast.error("File too large. Maximum size is 200MB.");
+      return;
+    }
+
+    setUploadState(lessonId, { status: "uploading", progress: 0 });
 
     try {
-      // Step 1: Read file as base64
-      const base64 = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const readProgress = Math.round((e.loaded / e.total) * 30);
-            setUploadState(lessonId, { progress: 10 + readProgress, status: "reading" });
-          }
-        };
-        reader.onload = () => {
-          const result = (reader.result as string).split(",")[1];
-          resolve(result);
-        };
-        reader.onerror = () => reject(new Error("Failed to read file"));
-        reader.readAsDataURL(file);
+      // Step 1: Upload to S3 via multipart form data with real progress tracking
+      const result = await uploadVideoFile(file, (percent) => {
+        setUploadState(lessonId, { progress: Math.min(percent, 95), status: "uploading" });
       });
 
-      // Step 2: Upload to S3
-      setUploadState(lessonId, { status: "uploading", progress: 45 });
-
-      // Simulate gradual progress during upload
-      const progressInterval = setInterval(() => {
-        setUploadStates(prev => {
-          const current = prev[lessonId];
-          if (current && current.status === "uploading" && current.progress < 80) {
-            return { ...prev, [lessonId]: { ...current, progress: current.progress + 2 } };
-          }
-          return prev;
-        });
-      }, 500);
-
-      const result = await uploadVideoMutation.mutateAsync({
-        fileName: file.name,
-        contentType: file.type,
-        base64Data: base64,
-      });
-
-      clearInterval(progressInterval);
-
-      // Step 3: Save URL to lesson
-      setUploadState(lessonId, { status: "saving", progress: 85 });
+      // Step 2: Save URL to lesson
+      setUploadState(lessonId, { status: "saving", progress: 97 });
 
       await updateLessonMutation.mutateAsync({
         id: lessonId,
@@ -156,36 +175,29 @@ export default function AdminCourseEditor() {
       setUploadState(lessonId, { status: "done", progress: 100 });
       toast.success("Video uploaded successfully!");
 
-      // Clear the done state after 3 seconds
+      // Clear the done state after 5 seconds
       setTimeout(() => {
         setUploadStates(prev => {
           const copy = { ...prev };
           delete copy[lessonId];
           return copy;
         });
-      }, 3000);
+      }, 5000);
 
-    } catch (err) {
-      setUploadState(lessonId, { status: "error", progress: 0 });
-      toast.error("Upload failed. Please try again.");
-      // Clear error state after 3 seconds
-      setTimeout(() => {
-        setUploadStates(prev => {
-          const copy = { ...prev };
-          delete copy[lessonId];
-          return copy;
-        });
-      }, 3000);
+    } catch (err: any) {
+      console.error("[VideoUpload] Error:", err);
+      const errorMessage = err?.message || "Upload failed. Please try again.";
+      setUploadState(lessonId, { status: "error", progress: 0, errorMessage });
+      toast.error(errorMessage);
     }
-  }, [uploadVideoMutation, updateLessonMutation, setUploadState]);
+  }, [updateLessonMutation, setUploadState]);
 
   const getUploadStatusText = (state: UploadState) => {
     switch (state.status) {
-      case "reading": return "Reading file...";
-      case "uploading": return "Uploading to cloud...";
-      case "saving": return "Saving...";
-      case "done": return "Complete!";
-      case "error": return "Failed";
+      case "uploading": return `Uploading to cloud... ${state.progress}%`;
+      case "saving": return "Saving to lesson...";
+      case "done": return "Upload complete!";
+      case "error": return state.errorMessage || "Upload failed";
       default: return "";
     }
   };
@@ -274,6 +286,7 @@ export default function AdminCourseEditor() {
               const LessonIcon = lessonTypeIcons[lesson.type] || FileText;
               const uploadState = uploadStates[lesson.id];
               const isUploading = uploadState && uploadState.status !== "idle";
+              const isActiveUpload = isUploading && uploadState.status !== "done" && uploadState.status !== "error";
 
               return (
                 <Card key={lesson.id} className="border-border/50">
@@ -290,7 +303,7 @@ export default function AdminCourseEditor() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {lesson.type === "video" && !lesson.videoUrl && !isUploading && (
+                        {lesson.type === "video" && !lesson.videoUrl && !isActiveUpload && uploadState?.status !== "done" && (
                           <>
                             <input
                               type="file"
@@ -310,6 +323,31 @@ export default function AdminCourseEditor() {
                             >
                               <Upload className="mr-1 h-3 w-3" />
                               Upload Video
+                            </Button>
+                          </>
+                        )}
+                        {/* Re-upload button for lessons that already have video */}
+                        {lesson.type === "video" && lesson.videoUrl && !isActiveUpload && uploadState?.status !== "done" && (
+                          <>
+                            <input
+                              type="file"
+                              accept="video/*"
+                              className="hidden"
+                              ref={(el) => { fileInputRefs.current[lesson.id] = el; }}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleVideoUpload(lesson.id, file);
+                                e.target.value = "";
+                              }}
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-muted-foreground"
+                              onClick={() => fileInputRefs.current[lesson.id]?.click()}
+                            >
+                              <RotateCcw className="mr-1 h-3 w-3" />
+                              Replace
                             </Button>
                           </>
                         )}
@@ -335,7 +373,7 @@ export default function AdminCourseEditor() {
                     </div>
 
                     {/* Upload Progress Bar */}
-                    {isUploading && uploadState.status !== "done" && (
+                    {isActiveUpload && (
                       <div className="mt-3 space-y-1.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">{getUploadStatusText(uploadState)}</span>
@@ -349,8 +387,22 @@ export default function AdminCourseEditor() {
                     )}
 
                     {uploadState?.status === "error" && (
-                      <div className="mt-3">
-                        <p className="text-xs text-destructive">Upload failed. Please try again.</p>
+                      <div className="mt-3 flex items-center justify-between">
+                        <p className="text-xs text-destructive">{uploadState.errorMessage || "Upload failed. Please try again."}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs h-7"
+                          onClick={() => {
+                            setUploadStates(prev => {
+                              const copy = { ...prev };
+                              delete copy[lesson.id];
+                              return copy;
+                            });
+                          }}
+                        >
+                          Dismiss
+                        </Button>
                       </div>
                     )}
                   </CardContent>
